@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { withCache } from '../cache';
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -88,21 +89,32 @@ function daysSince(isoDate: string): number {
 }
 
 export async function analyzeGitHub(packageName: string): Promise<GitHubResult> {
-  const repo = await getRepoFromNpm(packageName);
+  return withCache(
+    `github:${packageName}`,
+    async () => {
+      const repo = await getRepoFromNpm(packageName);
 
-  if (!repo) {
-    return { repoFound: false, lastCommit: null, daysSinceCommit: null, busFactor: 0 };
-  }
+      if (!repo) {
+        return {
+          repoFound      : false,
+          lastCommit     : null,
+          daysSinceCommit: null,
+          busFactor      : 0,
+        };
+      }
 
-  const [lastCommit, busFactor] = await Promise.all([
-    getLastCommit(repo),
-    getBusFactor(repo),
-  ]);
+      const [lastCommit, busFactor] = await Promise.all([
+        getLastCommit(repo),
+        getBusFactor(repo),
+      ]);
 
-  return {
-    repoFound: true,
-    lastCommit,
-    daysSinceCommit: lastCommit ? daysSince(lastCommit) : null,
-    busFactor,
-  };
+      return {
+        repoFound      : true,
+        lastCommit,
+        daysSinceCommit: lastCommit ? daysSince(lastCommit) : null,
+        busFactor,
+      };
+    },
+    1000 * 60 * 60 * 24 // 24 hour TTL
+  );
 }

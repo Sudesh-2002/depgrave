@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { withCache } from '../cache';
 
 const OSV_URL = 'https://api.osv.dev/v1/query';
 
@@ -52,47 +53,50 @@ function cvssToSeverityLabel(score: number | null): string {
 
 export async function analyzeOSV(
   packageName: string,
-  version: string
+  version    : string
 ): Promise<OSVResult> {
-  try {
-    const body = {
-      version,
-      package: {
-        name: packageName,
-        ecosystem: 'npm',
-      },
-    };
+  return withCache(
+    `osv:${packageName}@${version}`,
+    async () => {
+      try {
+        const body = {
+          version,
+          package: { name: packageName, ecosystem: 'npm' },
+        };
 
-    const res = await fetch(OSV_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+        const res = await fetch(OSV_URL, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify(body),
+        });
 
-    if (!res.ok) return { openCVEs: [], cveCount: 0, maxCvssScore: null };
+        if (!res.ok) return { openCVEs: [], cveCount: 0, maxCvssScore: null };
 
-    const data  = await res.json() as any;
-    const vulns: any[] = data?.vulns ?? [];
+        const data  = await res.json() as any;
+        const vulns : any[] = data?.vulns ?? [];
 
-    const openCVEs: CVEEntry[] = vulns.map(v => {
-      const cvssScore = parseCvssScore(v);
-      return {
-        id       : v.id ?? 'UNKNOWN',
-        severity : cvssToSeverityLabel(cvssScore),
-        cvssScore,
-        summary  : v.summary ?? 'No summary available',
-        url      : `https://osv.dev/vulnerability/${v.id}`,
-      };
-    });
+        const openCVEs: CVEEntry[] = vulns.map(v => {
+          const cvssScore = parseCvssScore(v);
+          return {
+            id       : v.id ?? 'UNKNOWN',
+            severity : cvssToSeverityLabel(cvssScore),
+            cvssScore,
+            summary  : v.summary ?? 'No summary available',
+            url      : `https://osv.dev/vulnerability/${v.id}`,
+          };
+        });
 
-    const scores = openCVEs
-      .map(c => c.cvssScore)
-      .filter((s): s is number => s !== null);
+        const scores = openCVEs
+          .map(c => c.cvssScore)
+          .filter((s): s is number => s !== null);
 
-    const maxCvssScore = scores.length > 0 ? Math.max(...scores) : null;
+        const maxCvssScore = scores.length > 0 ? Math.max(...scores) : null;
 
-    return { openCVEs, cveCount: openCVEs.length, maxCvssScore };
-  } catch {
-    return { openCVEs: [], cveCount: 0, maxCvssScore: null };
-  }
+        return { openCVEs, cveCount: openCVEs.length, maxCvssScore };
+      } catch {
+        return { openCVEs: [], cveCount: 0, maxCvssScore: null };
+      }
+    },
+    1000 * 60 * 60 * 6 // 6 hour TTL for CVEs (more time-sensitive)
+  );
 }
