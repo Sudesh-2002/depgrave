@@ -1,0 +1,14 @@
+{
+  "name": "depgrave",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:cli": "cd packages/cli && pnpm dev",
+    "build:cli": "cd packages/cli && pnpm build",
+    "build:web": "cd packages/web && pnpm build"
+  },
+  "devDependencies": {
+    "@types/node": "^25.8.0",
+    "typescript": "^6.0.3"
+  }
+}
