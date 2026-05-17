@@ -1,18 +1,29 @@
 import { resolve } from './resolvers/index';
+import { analyzeGitHub } from './analyzers/github';
 
 const projectRoot = process.argv[2] ?? process.cwd();
 
 console.log(`\n🪦 depgrave — scanning: ${projectRoot}\n`);
 
-try {
+async function main() {
   const packages = resolve(projectRoot);
-  console.log(`Found ${packages.length} packages:\n`);
-  packages.slice(0, 10).forEach(p => {
-    console.log(`  ${p.name}@${p.version}`);
-  });
-  if (packages.length > 10) {
-    console.log(`  ... and ${packages.length - 10} more`);
+  console.log(`Found ${packages.length} packages. Analyzing first 3...\n`);
+
+  const sample = packages.slice(0, 3);
+
+  for (const pkg of sample) {
+    console.log(`Analyzing ${pkg.name}@${pkg.version}...`);
+    const result = await analyzeGitHub(pkg.name);
+
+    if (!result.repoFound) {
+      console.log(`  ❌ No GitHub repo found\n`);
+      continue;
+    }
+
+    console.log(`  Last commit : ${result.lastCommit}`);
+    console.log(`  Days since  : ${result.daysSinceCommit}`);
+    console.log(`  Bus factor  : ${result.busFactor} contributor(s)\n`);
   }
-} catch (err: any) {
-  console.error('Error:', err.message);
 }
+
+main().catch(console.error);
