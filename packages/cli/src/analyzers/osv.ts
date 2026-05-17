@@ -5,6 +5,7 @@ const OSV_URL = 'https://api.osv.dev/v1/query';
 export interface CVEEntry {
   id: string;
   severity: string;
+  cvssScore: number | null;
   summary: string;
   url: string;
 }
@@ -12,27 +13,41 @@ export interface CVEEntry {
 export interface OSVResult {
   openCVEs: CVEEntry[];
   cveCount: number;
+  maxCvssScore: number | null;
 }
 
-function extractSeverity(vuln: any): string {
-  // Try database_specific severity first
-  const dbSeverity = vuln?.database_specific?.severity;
-  if (dbSeverity) return dbSeverity.toLowerCase();
-
-  // Try severity array
+// parse CVSS base score out of the vector string
+// e.g. "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H" → 9.8
+function parseCvssScore(vuln: any): number | null {
+  // OSV puts scores in severity array
   const severities: any[] = vuln?.severity ?? [];
-  if (severities.length > 0) {
-    const score = severities[0]?.score ?? '';
-    if (score.startsWith('CVSS:') ) {
-      // extract base score from CVSS string
-      const parts = score.split('/');
-      const av = parts.find((p: string) => p.startsWith('AV:'));
-      if (av) return 'medium'; // fallback if we can't parse
+
+  for (const s of severities) {
+    // some entries have a numeric score directly
+    if (typeof s.score === 'number') return s.score;
+
+    // some have CVSS vector string — extract score from database_specific
+    if (s.type === 'CVSS_V3' || s.type === 'CVSS_V2') {
+      const dbScore = vuln?.database_specific?.cvss_v3?.score
+                   ?? vuln?.database_specific?.cvss?.score;
+      if (typeof dbScore === 'number') return dbScore;
     }
-    return severities[0]?.type?.toLowerCase() ?? 'unknown';
   }
 
-  return 'unknown';
+  // fallback: check database_specific directly
+  const direct = vuln?.database_specific?.cvss_v3?.score
+              ?? vuln?.database_specific?.cvss?.score
+              ?? vuln?.database_specific?.severity_score;
+
+  return typeof direct === 'number' ? direct : null;
+}
+
+function cvssToSeverityLabel(score: number | null): string {
+  if (score === null) return 'unknown';
+  if (score >= 9.0) return 'critical';
+  if (score >= 7.0) return 'high';
+  if (score >= 4.0) return 'medium';
+  return 'low';
 }
 
 export async function analyzeOSV(
@@ -54,25 +69,30 @@ export async function analyzeOSV(
       body: JSON.stringify(body),
     });
 
-    if (!res.ok) {
-      return { openCVEs: [], cveCount: 0 };
-    }
+    if (!res.ok) return { openCVEs: [], cveCount: 0, maxCvssScore: null };
 
-    const data = await res.json() as any;
+    const data  = await res.json() as any;
     const vulns: any[] = data?.vulns ?? [];
 
-    const openCVEs: CVEEntry[] = vulns.map(v => ({
-      id:       v.id ?? 'UNKNOWN',
-      severity: extractSeverity(v),
-      summary:  v.summary ?? 'No summary available',
-      url:      `https://osv.dev/vulnerability/${v.id}`,
-    }));
+    const openCVEs: CVEEntry[] = vulns.map(v => {
+      const cvssScore = parseCvssScore(v);
+      return {
+        id       : v.id ?? 'UNKNOWN',
+        severity : cvssToSeverityLabel(cvssScore),
+        cvssScore,
+        summary  : v.summary ?? 'No summary available',
+        url      : `https://osv.dev/vulnerability/${v.id}`,
+      };
+    });
 
-    return {
-      openCVEs,
-      cveCount: openCVEs.length,
-    };
+    const scores = openCVEs
+      .map(c => c.cvssScore)
+      .filter((s): s is number => s !== null);
+
+    const maxCvssScore = scores.length > 0 ? Math.max(...scores) : null;
+
+    return { openCVEs, cveCount: openCVEs.length, maxCvssScore };
   } catch {
-    return { openCVEs: [], cveCount: 0 };
+    return { openCVEs: [], cveCount: 0, maxCvssScore: null };
   }
 }
