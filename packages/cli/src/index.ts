@@ -9,8 +9,12 @@ import { exportCsv } from './output/csv';
 import { parseArgs } from './args';
 import { pLimit } from './utils';
 import chalk from 'chalk';
+import { cacheClear, cacheStats } from './cache';
 
 const args = parseArgs(process.argv);
+
+if (args.clearCache) { cacheClear(); process.exit(0); }
+if (args.cacheStats) { cacheStats(); process.exit(0); }
 
 async function analyzePackage(
   name   : string,
