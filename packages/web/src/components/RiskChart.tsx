@@ -27,7 +27,6 @@ export function RiskChart({ report }: { report: Report }) {
       gap                 : '16px',
       marginBottom        : '24px',
     }}>
-      {/* Pie chart */}
       <div style={{
         background   : '#13131f',
         border       : '1px solid #2d2d3d',
@@ -60,7 +59,6 @@ export function RiskChart({ report }: { report: Report }) {
         </PieChart>
       </div>
 
-      {/* Bar chart — top 10 riskiest */}
       <div style={{
         background   : '#13131f',
         border       : '1px solid #2d2d3d',

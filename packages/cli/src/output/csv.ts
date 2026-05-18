@@ -5,7 +5,6 @@ import { TableRow } from './table';
 function escape(value: string | number | null): string {
   if (value === null || value === undefined) return '';
   const str = value.toString();
-  // wrap in quotes if it contains comma, quote, or newline
   if (str.includes(',') || str.includes('"') || str.includes('\n')) {
     return `"${str.replace(/"/g, '""')}"`;
   }

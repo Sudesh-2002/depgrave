@@ -18,13 +18,10 @@ export interface OSVResult {
 }
 
 // parse CVSS base score out of the vector string
-// e.g. "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H" → 9.8
 function parseCvssScore(vuln: any): number | null {
-  // OSV puts scores in severity array
   const severities: any[] = vuln?.severity ?? [];
 
   for (const s of severities) {
-    // some entries have a numeric score directly
     if (typeof s.score === 'number') return s.score;
 
     // some have CVSS vector string — extract score from database_specific
@@ -97,6 +94,6 @@ export async function analyzeOSV(
         return { openCVEs: [], cveCount: 0, maxCvssScore: null };
       }
     },
-    1000 * 60 * 60 * 6 // 6 hour TTL for CVEs (more time-sensitive)
+    1000 * 60 * 60 * 6
   );
 }

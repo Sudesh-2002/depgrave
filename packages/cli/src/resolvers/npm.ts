@@ -31,8 +31,8 @@ function fromPackageLock(lockPath: string): ResolvedPackage[] {
   // lockfileVersion 2 and 3 use "packages" key
   if (lock.packages) {
     for (const [key, val] of Object.entries(lock.packages as Record<string, any>)) {
-      if (key === '') continue; // skip root entry
-      if (val.dev) continue;   // skip devDependencies
+      if (key === '') continue;
+      if (val.dev) continue
 
       // key is like "node_modules/chalk" or "node_modules/a/node_modules/b"
       const name = key.replace(/^.*node_modules\//, '');

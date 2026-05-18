@@ -66,7 +66,6 @@ export function PackageTable({ packages }: { packages: PackageRow[] }) {
 
   return (
     <div>
-      {/* filters */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
         <input
           placeholder="Search packages..."
@@ -104,7 +103,6 @@ export function PackageTable({ packages }: { packages: PackageRow[] }) {
         </div>
       </div>
 
-      {/* table */}
       <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #2d2d3d' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead style={{ background: '#0d0d1a' }}>
