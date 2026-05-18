@@ -6,37 +6,36 @@ on:
   pull_request:
     branches: [main, master]
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
   scan:
     name: Scan dependency risk
     runs-on: ubuntu-latest
 
     steps:
-      # ── checkout ────────────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ── setup node ──────────────────────────────────────────────
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      # ── setup pnpm ──────────────────────────────────────────────
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 9
 
-      # ── install deps ────────────────────────────────────────────
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # ── build cli ───────────────────────────────────────────────
       - name: Build CLI
         run: cd packages/cli && pnpm build
 
-      # ── run depgrave on the repo itself ─────────────────────────
       - name: Run depgrave scan
         env:
           GITHUB_TOKEN: ${{ secrets.DEPGRAVE_GITHUB_TOKEN }}
@@ -47,7 +46,6 @@ jobs:
         continue-on-error: true
         id: scan
 
-      # ── upload report as artifact ────────────────────────────────
       - name: Upload depgrave report
         uses: actions/upload-artifact@v4
         with:
@@ -55,11 +53,11 @@ jobs:
           path: depgrave-report.json
           retention-days: 30
 
-      # ── comment on PR with summary ───────────────────────────────
       - name: Comment risk summary on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs   = require('fs');
             const path = 'depgrave-report.json';
@@ -71,9 +69,6 @@ jobs:
 
             const report  = JSON.parse(fs.readFileSync(path, 'utf8'));
             const { summary, total, scannedAt } = report;
-
-            const badge = (count, label, emoji) =>
-              count > 0 ? `${emoji} **${count} ${label}**` : `✅ 0 ${label}`;
 
             const body = [
               '## 🪦 depgrave — dependency risk report',
@@ -92,14 +87,13 @@ jobs:
                 : '> ✅ No critical packages found.',
             ].join('\n');
 
-            github.rest.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number : context.issue.number,
               owner        : context.repo.owner,
               repo         : context.repo.repo,
               body,
             });
 
-      # ── fail the build if critical packages found ────────────────
       - name: Fail if critical packages found
         if: steps.scan.outcome == 'failure'
         run: |
