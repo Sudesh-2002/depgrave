@@ -1,0 +1,123 @@
+{
+  "scannedAt": "2026-05-18T02:23:41.417Z",
+  "projectRoot": "C:\\Users\\sudes\\OneDrive\\Desktop\\My_Projects\\SmartReminder",
+  "total": 10,
+  "summary": {
+    "low": 9,
+    "medium": 1,
+    "high": 0,
+    "critical": 0
+  },
+  "packages": [
+    {
+      "name": "@0no-co/graphql.web",
+      "version": "1.2.0",
+      "daysSinceCommit": 261,
+      "cveCount": 0,
+      "maxCvssScore": null,
+      "busFactor": 0,
+      "weeklyDownloads": 5351154,
+      "riskScore": 30,
+      "riskLevel": "medium"
+    },
+    {
+      "name": "@babel/helper-define-polyfill-provider",
+      "version": "0.6.5",
+      "daysSinceCommit": 37,
+      "cveCount": 0,
+      "maxCvssScore": null,
+      "busFactor": 2,
+      "weeklyDownloads": 44489306,
+      "riskScore": 10,
+      "riskLevel": "low"
+    },
+    {
+      "name": "@babel/code-frame",
+      "version": "7.28.6",
+      "daysSinceCommit": 1,
+      "cveCount": 0,
+      "maxCvssScore": null,
+      "busFactor": 10,
+      "weeklyDownloads": 189128508,
+      "riskScore": 0,
+      "riskLevel": "low"
+    },
+    {
+      "name": "@babel/compat-data",
+      "version": "7.28.6",
+      "daysSinceCommit": 1,
+      "cveCount": 0,
+      "maxCvssScore": null,
+      "busFactor": 10,
+      "weeklyDownloads": 132236020,
+      "riskScore": 0,
+      "riskLevel": "low"
+    },
+    {
+      "name": "@babel/core",
+      "version": "7.28.6",
+      "daysSinceCommit": 1,
+      "cveCount": 0,
+      "maxCvssScore": null,
+      "busFactor": 10,
+      "weeklyDownloads": 141040737,
+      "riskScore": 0,
+      "riskLevel": "low"
+    },
+    {
+      "name": "@babel/generator",
+      "version": "7.28.6",
+      "daysSinceCommit": 1,
+      "cveCount": 0,
+      "maxCvssScore": null,
+      "busFactor": 10,
+      "weeklyDownloads": 123970409,
+      "riskScore": 0,
+      "riskLevel": "low"
+    },
+    {
+      "name": "@babel/helper-annotate-as-pure",
+      "version": "7.27.3",
+      "daysSinceCommit": 1,
+      "cveCount": 0,
+      "maxCvssScore": null,
+      "busFactor": 10,
+      "weeklyDownloads": 62305997,
+      "riskScore": 0,
+      "riskLevel": "low"
+    },
+    {
+      "name": "@babel/helper-compilation-targets",
+      "version": "7.28.6",
+      "daysSinceCommit": 1,
+      "cveCount": 0,
+      "maxCvssScore": null,
+      "busFactor": 10,
+      "weeklyDownloads": 126956889,
+      "riskScore": 0,
+      "riskLevel": "low"
+    },
+    {
+      "name": "@babel/helper-create-class-features-plugin",
+      "version": "7.28.6",
+      "daysSinceCommit": 1,
+      "cveCount": 0,
+      "maxCvssScore": null,
+      "busFactor": 10,
+      "weeklyDownloads": 46517586,
+      "riskScore": 0,
+      "riskLevel": "low"
+    },
+    {
+      "name": "@babel/helper-create-regexp-features-plugin",
+      "version": "7.28.5",
+      "daysSinceCommit": 1,
+      "cveCount": 0,
+      "maxCvssScore": null,
+      "busFactor": 10,
+      "weeklyDownloads": 34165928,
+      "riskScore": 0,
+      "riskLevel": "low"
+    }
+  ]
+}
