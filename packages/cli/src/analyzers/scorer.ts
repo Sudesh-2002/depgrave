@@ -13,7 +13,7 @@ export interface RiskResult {
   };
 }
 
-// ── commit age score (0–25pts) ───────────────────────────────────
+// commit age score (0–25pts)
 function scoreCommitAge(daysSinceCommit: number | null): number {
   if (daysSinceCommit === null) return 15;
   if (daysSinceCommit <= 180)  return 0;
@@ -22,9 +22,7 @@ function scoreCommitAge(daysSinceCommit: number | null): number {
   return 25;
 }
 
-// ── CVSS-based CVE score (0–40pts) ──────────────────────────────
-// Uses real CVSS v3 base score (0.0–10.0) where available,
-// falls back to severity label weighting
+// CVSS-based CVE score (0–40pts) 
 const SEVERITY_FALLBACK: Record<string, number> = {
   critical : 9.5,
   high     : 7.5,
@@ -40,14 +38,13 @@ function scoreCVEs(cves: CVEEntry[], maxCvssScore: number | null): number {
   const effectiveScore = maxCvssScore
     ?? Math.max(...cves.map(c => SEVERITY_FALLBACK[c.severity] ?? 4.0));
 
-  // CVSS 0–10 → 0–35pts, then add volume bonus
   const cvssPoints  = (effectiveScore / 10) * 35;
   const volumeBonus = Math.min(5, (cves.length - 1) * 2);
 
   return Math.min(40, Math.round(cvssPoints + volumeBonus));
 }
 
-// ── bus factor score (0–20pts) ───────────────────────────────────
+// bus factor score (0–20pts)
 function scoreBusFactor(busFactor: number): number {
   if (busFactor >= 5) return 0;
   if (busFactor >= 3) return 5;
@@ -55,11 +52,8 @@ function scoreBusFactor(busFactor: number): number {
   return 20;
 }
 
-// ── popularity score (0–15pts) ───────────────────────────────────
-// High download count = more community eyes = lower risk
-// Low download count = obscure package = higher risk
 function scorePopularity(weeklyDownloads: number | null): number {
-  if (weeklyDownloads === null) return 8; // unknown = neutral penalty
+  if (weeklyDownloads === null) return 8;
   if (weeklyDownloads >= 1_000_000) return 0;
   if (weeklyDownloads >= 100_000)   return 3;
   if (weeklyDownloads >= 10_000)    return 6;
@@ -67,7 +61,6 @@ function scorePopularity(weeklyDownloads: number | null): number {
   return 15;
 }
 
-// ── risk level from score ────────────────────────────────────────
 function toRiskLevel(score: number): RiskLevel {
   if (score <= 25) return 'low';
   if (score <= 50) return 'medium';
@@ -75,7 +68,7 @@ function toRiskLevel(score: number): RiskLevel {
   return 'critical';
 }
 
-// ── main export ──────────────────────────────────────────────────
+// main export
 export function calculateRisk(
   daysSinceCommit  : number | null,
   cves             : CVEEntry[],

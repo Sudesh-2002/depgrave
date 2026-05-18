@@ -115,6 +115,6 @@ export async function analyzeGitHub(packageName: string): Promise<GitHubResult> 
         busFactor,
       };
     },
-    1000 * 60 * 60 * 24 // 24 hour TTL
+    1000 * 60 * 60 * 24
   );
 }

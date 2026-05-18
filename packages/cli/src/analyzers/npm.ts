@@ -16,6 +16,6 @@ export async function getWeeklyDownloads(packageName: string): Promise<number | 
         return null;
       }
     },
-    1000 * 60 * 60 * 12 // 12 hour TTL for download counts
+    1000 * 60 * 60 * 12
   );
 }

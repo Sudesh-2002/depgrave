@@ -74,7 +74,6 @@ async function main() {
 
   process.stdout.write('\r' + ' '.repeat(50) + '\r');
 
-  // always render terminal table
   renderTable(rows);
 
   // export if --output flag provided

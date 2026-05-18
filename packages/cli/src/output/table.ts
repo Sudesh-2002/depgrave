@@ -14,7 +14,6 @@ export interface TableRow {
   riskLevel       : RiskLevel;
 }
 
-// ── color helpers ────────────────────────────────────────────────
 const LEVEL_COLOR: Record<RiskLevel, (s: string) => string> = {
   low      : (s) => chalk.green(s),
   medium   : (s) => chalk.yellow(s),
@@ -66,7 +65,7 @@ function formatDownloads(n: number | null): string {
   return chalk.red(n.toString());
 }
 
-// ── summary banner ───────────────────────────────────────────────
+// summary banner
 function printSummary(rows: TableRow[]): void {
   const counts: Record<RiskLevel, number> = {
     low: 0, medium: 0, high: 0, critical: 0
@@ -81,9 +80,9 @@ function printSummary(rows: TableRow[]): void {
   console.log(chalk.gray(`  Total      : ${rows.length} packages\n`));
 }
 
-// ── main render ──────────────────────────────────────────────────
+// main render 
 export function renderTable(rows: TableRow[]): void {
-  // sort by risk score descending
+
   const sorted = [...rows].sort((a, b) => b.riskScore - a.riskScore);
 
   const table = new Table({

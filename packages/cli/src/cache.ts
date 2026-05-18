@@ -4,17 +4,17 @@ import * as os from 'os';
 
 const CACHE_DIR     = path.join(os.homedir(), '.depgrave');
 const CACHE_FILE    = path.join(CACHE_DIR, 'cache.json');
-const DEFAULT_TTL   = 1000 * 60 * 60 * 24; // 24 hours in ms
+const DEFAULT_TTL   = 1000 * 60 * 60 * 24;
 
 interface CacheEntry<T> {
   value     : T;
-  cachedAt  : number; // unix ms
-  ttl       : number; // ms
+  cachedAt  : number;
+  ttl       : number;
 }
 
 type CacheStore = Record<string, CacheEntry<any>>;
 
-// ── load & save ──────────────────────────────────────────────────
+// load & save
 function load(): CacheStore {
   try {
     if (!fs.existsSync(CACHE_FILE)) return {};
@@ -32,11 +32,9 @@ function save(store: CacheStore): void {
     }
     fs.writeFileSync(CACHE_FILE, JSON.stringify(store, null, 2), 'utf-8');
   } catch {
-    // cache write failures are non-fatal
   }
 }
 
-// ── public API ───────────────────────────────────────────────────
 export function cacheGet<T>(key: string): T | null {
   const store = load();
   const entry = store[key];
@@ -91,7 +89,7 @@ export function cacheStats(): void {
   }
 }
 
-// ── cache-aware fetch wrapper ────────────────────────────────────
+// cache-aware fetch wrapper 
 export async function withCache<T>(
   key     : string,
   fn      : () => Promise<T>,
