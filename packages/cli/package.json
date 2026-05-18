@@ -1,25 +1,54 @@
 {
-  "name": "@depgrave/cli",
+  "name": "depgrave",
   "version": "1.0.0",
+  "description": "Analyzes your full dependency tree — last commit date, open CVEs, bus factor, and risk score per package",
+  "keywords": [
+    "security",
+    "dependencies",
+    "audit",
+    "cve",
+    "risk",
+    "supply-chain",
+    "cli"
+  ],
+  "author": "your-name <your@email.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/depgrave"
+  },
+  "homepage": "https://github.com/your-username/depgrave#readme",
+  "bugs": {
+    "url": "https://github.com/your-username/depgrave/issues"
+  },
   "main": "dist/index.js",
   "bin": {
     "depgrave": "./dist/index.js"
   },
-  "scripts": {
-    "dev": "ts-node src/index.ts",
-    "build": "tsc"
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
   },
-  "devDependencies": {
-    "@types/node": "^25.8.0",
-    "@types/node-fetch": "^2.6.13",
-    "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+  "scripts": {
+    "dev"            : "ts-node src/index.ts",
+    "build"          : "tsc",
+    "prepublishOnly" : "pnpm build"
   },
   "dependencies": {
-    "chalk": "^5.6.2",
-    "cli-table3": "^0.6.5",
-    "dotenv": "^17.4.2",
-    "node-fetch": "^2.7.0",
-    "ora": "^9.4.0"
+    "chalk"      : "^5.6.2",
+    "cli-table3" : "^0.6.5",
+    "dotenv"     : "^17.4.2",
+    "node-fetch" : "^2.7.0",
+    "ora"        : "^9.4.0"
+  },
+  "devDependencies": {
+    "@types/node"       : "^25.8.0",
+    "@types/node-fetch" : "^2.6.13",
+    "ts-node"           : "^10.9.2",
+    "typescript"        : "^6.0.3"
   }
 }
